@@ -3,11 +3,14 @@ FROM ruby:2
 ENV PRONTO_ROOT /data
 WORKDIR $PRONTO_ROOT
 
-RUN apt-get update -y && apt-get install -y \
-    cmake \
-    php5
+RUN apt-get update -y \
+    && apt-get install -y apt-transport-https lsb-release ca-certificates \
+    && wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg \
+    && echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list
 
-RUN gem install pronto -v "< 0.8.0" && \
+RUN apt-get update -y && apt-get install -y cmake php7.0-cli php7.0-xml
+
+RUN gem install pronto -v "< 0.8.2" && \
     gem install pronto-phpcs && \
     gem install pronto-phpmd
 
@@ -22,3 +25,5 @@ RUN composer global require \
     phpmd/phpmd
 
 CMD [ "pronto", "run" ]
+
+WORKDIR /data
